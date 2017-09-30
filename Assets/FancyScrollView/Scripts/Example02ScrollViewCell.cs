@@ -6,26 +6,22 @@ namespace FancyScrollViewExamples
     public class Example02ScrollViewCell
         : FancyScrollViewCell<Example02CellDto, Example02ScrollViewContext>
     {
-        [SerializeField]
-        Animator animator;
+        //[SerializeField]
+        //Animator animator;
         [SerializeField]
         Text message;
         [SerializeField]
         Image image;
         [SerializeField]
         Button button;
+        [SerializeField]
+        RectTransform rectTransform;
 
         static readonly int scrollTriggerHash = Animator.StringToHash("scroll");
         Example02ScrollViewContext context;
 
         void Start()
         {
-            var rectTransform = transform as RectTransform;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchoredPosition3D = Vector3.zero;
-            UpdatePosition(0);
-
             button.onClick.AddListener(OnPressedCell);
         }
 
@@ -55,14 +51,19 @@ namespace FancyScrollViewExamples
             }
         }
 
+        private int cellWidth = 200;
+        private int scrollSpace = 30;
         /// <summary>
         /// セルの位置を更新します
         /// </summary>
         /// <param name="position"></param>
         public override void UpdatePosition(float position)
         {
-            animator.Play(scrollTriggerHash, -1, position);
-            animator.speed = 0;
+            Debug.Log("UpdatePosition " + position);
+            Vector3 anchorPos = rectTransform.anchoredPosition3D;
+            anchorPos.x = position;
+            anchorPos.z = 0;
+            rectTransform.anchoredPosition3D = anchorPos;
         }
 
         void OnPressedCell()
