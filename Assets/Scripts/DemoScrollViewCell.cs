@@ -3,8 +3,8 @@ using UnityEngine.UI;
 
 namespace FancyScrollViewExamples
 {
-    public class Example04ScrollViewCell
-        : FancyScrollViewCell<Example04CellDto, Example04ScrollViewContext>
+    public class DemoScrollViewCell
+        : FancyScrollViewCell<DemoCellDto, DemoScrollViewContext>
     {
         [SerializeField]
         Text message;
@@ -14,9 +14,8 @@ namespace FancyScrollViewExamples
         Button button;
         [SerializeField]
         RectTransform rectTransform;
-
-        static readonly int scrollTriggerHash = Animator.StringToHash("scroll");
-        Example04ScrollViewContext context;
+        
+        DemoScrollViewContext context;
 
         void Start()
         {
@@ -24,19 +23,19 @@ namespace FancyScrollViewExamples
         }
 
         /// <summary>
-        /// コンテキストを設定します
+        /// Set the context
         /// </summary>
         /// <param name="context"></param>
-        public override void SetContext(Example04ScrollViewContext context)
+        public override void SetContext(DemoScrollViewContext context)
         {
             this.context = context;
         }
 
         /// <summary>
-        /// セルの内容を更新します
+        /// Update cell contents
         /// </summary>
         /// <param name="itemData"></param>
-        public override void UpdateContent(Example04CellDto itemData)
+        public override void UpdateContent(DemoCellDto itemData)
         {
             message.text = itemData.Message;
 
@@ -50,15 +49,12 @@ namespace FancyScrollViewExamples
         }
 
         /// <summary>
-        /// セルの位置を更新します
+        /// Update cell position
         /// </summary>
         /// <param name="position"></param>
         public override float UpdatePosition(Vector3 preItemAnchorPos, float preItemWeight, float offset)
         {
             Vector3 anchorPos = rectTransform.anchoredPosition3D;
-            //if (this.message.text.Equals("Cell 0")) {
-            //    Debug.LogError(preItemAnchorPos.x + " preItemWeight " + preItemWeight);
-            //}
             anchorPos.x = preItemAnchorPos.x + preItemWeight + offset;
             anchorPos.z = 0;
             rectTransform.anchoredPosition3D = anchorPos;

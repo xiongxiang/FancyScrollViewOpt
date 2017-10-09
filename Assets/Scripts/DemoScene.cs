@@ -6,10 +6,10 @@ using UnityEngine.UI;
 
 namespace FancyScrollViewExamples
 {
-    public class Example04Scene : MonoBehaviour
+    public class DemoScene : MonoBehaviour
     {
         [SerializeField]
-        Example04ScrollView scrollView;
+        DemoScrollView scrollView;
         [SerializeField]
         Button prevCellButton;
         [SerializeField]
@@ -17,8 +17,8 @@ namespace FancyScrollViewExamples
         [SerializeField]
         Text selectedItemInfo;
 
-        List<Example04CellDto> cellData;
-        Example04ScrollViewContext context;
+        List<DemoCellDto> cellData;
+        DemoScrollViewContext context;
 
         void HandlePrevButton()
         {
@@ -52,9 +52,9 @@ namespace FancyScrollViewExamples
         void Start()
         {
             cellData = Enumerable.Range(0, 20)
-                .Select(i => new Example04CellDto { Message = "Cell " + i })
+                .Select(i => new DemoCellDto { Message = "Cell " + i })
                 .ToList();
-            context = new Example04ScrollViewContext();
+            context = new DemoScrollViewContext();
             context.OnSelectedIndexChanged = HandleSelectedIndexChanged;
             context.SelectedIndex = 0;
 

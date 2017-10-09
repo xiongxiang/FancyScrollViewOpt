@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FancyScrollViewExamples
 {
-    public class Example04ScrollView : FancyScrollView<Example04CellDto, Example04ScrollViewContext>
+    public class DemoScrollView : FancyScrollView<DemoCellDto, DemoScrollViewContext>
     {
         [SerializeField]
         ScrollPositionController scrollPositionController;
@@ -17,7 +17,7 @@ namespace FancyScrollViewExamples
             base.Awake();
         }
 
-        public void UpdateData(List<Example04CellDto> data, Example04ScrollViewContext context)
+        public void UpdateData(List<DemoCellDto> data, DemoScrollViewContext context)
         {
             context.OnPressedCell = OnPressedCell;
             SetContext(context);
@@ -40,7 +40,7 @@ namespace FancyScrollViewExamples
             UpdateContents();
         }
 
-        void OnPressedCell(Example04ScrollViewCell cell)
+        void OnPressedCell(DemoScrollViewCell cell)
         {
             UpdateSelection(cell.DataIndex);
         }

@@ -2,7 +2,7 @@
 
 namespace FancyScrollViewExamples
 {
-    public class Example04ScrollViewContext
+    public class DemoScrollViewContext
     {
         int selectedIndex = -1;
 
@@ -23,7 +23,7 @@ namespace FancyScrollViewExamples
             }
         }
 
-        public Action<Example04ScrollViewCell> OnPressedCell;
+        public Action<DemoScrollViewCell> OnPressedCell;
         public Action<int> OnSelectedIndexChanged;
     }
 }

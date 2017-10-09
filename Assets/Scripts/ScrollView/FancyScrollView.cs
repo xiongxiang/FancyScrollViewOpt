@@ -18,7 +18,7 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
     }
 
     /// <summary>
-    /// コンテキストを設定します
+    /// Set the context
     /// </summary>
     /// <param name="context"></param>
     protected void SetContext(TContext context) {
@@ -30,7 +30,7 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
     }
 
     /// <summary>
-    /// セルを生成して返します
+    /// Generate and return a cell
     /// </summary>
     /// <returns></returns>
     FancyScrollViewCell<TData, TContext> CreateCell() {
@@ -49,7 +49,7 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
     }
 
     /// <summary>
-    /// セルの内容を更新します
+    /// Update cell contents
     /// </summary>
     /// <param name="cell"></param>
     /// <param name="dataIndex"></param>
@@ -68,7 +68,7 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
     }
 
     /// <summary>
-    /// 円環構造の index を取得します
+    /// Gets the index of torus structure
     /// </summary>
     /// <param name="index"></param>
     /// <param name="length"></param>
@@ -83,7 +83,7 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
     }
 
     /// <summary>
-    /// 表示内容を更新します
+    /// Update display contents
     /// </summary>
     protected void UpdateContents() {
         UpdatePosition(currentPosition);
@@ -102,7 +102,7 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
 
 
     /// <summary>
-    /// スクロール位置を更新します
+    /// Update the scroll position
     /// </summary>
     /// <param name="position"></param>
     protected void UpdatePosition(float position) {
@@ -124,8 +124,6 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
         float itemWidth = 0;
         int cellsCount = cells.Count;
         for (int i = 1; i < cellsCount; i++) {
-            //dataIndex = Mathf.CeilToInt(position) + i;
-            //int cellIndex = GetLoopIndex(dataIndex, cellsCount);
             dataIndex = i;
             int cellIndex = i;
             if (cells[cellIndex].gameObject.activeSelf) {
@@ -149,13 +147,6 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
                 --i;
             }
         }
-
-        //cellIndex = GetLoopIndex(dataStartIndex + count, cells.Count);
-
-        //for (; count < cells.Count; count++, cellIndex = GetLoopIndex(dataStartIndex + count, cells.Count))
-        //{
-        //    cells[cellIndex].SetVisible(false);
-        //}
     }
 }
 
