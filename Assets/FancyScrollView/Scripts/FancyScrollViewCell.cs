@@ -22,8 +22,16 @@ public class FancyScrollViewCell<TData, TContext> : MonoBehaviour where TContext
     /// セルの位置を更新します
     /// </summary>
     /// <param name="position"></param>
-    public virtual void UpdatePosition(float position)
-    {
+    public virtual float UpdatePosition(Vector3 preItemAnchorPos, float preItemWeight, float offset) {
+        return 0.0f;
+    }
+
+    public virtual float GetItemWidth() {
+        return 0.0f;
+    }
+
+    public virtual Vector3 GetItemAnchorPos() {
+        return Vector3.zero;
     }
 
     /// <summary>

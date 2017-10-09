@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : class
-{
+public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : class {
     [SerializeField, Range(float.Epsilon, 1f)]
     float cellInterval;
     [SerializeField, Range(0f, 1f)]
@@ -10,7 +9,7 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
     [SerializeField]
     bool loop;
     [SerializeField]
-    GameObject cellBase;
+    RectTransform pnlList;
 
     float currentPosition;
     readonly List<FancyScrollViewCell<TData, TContext>> cells =
@@ -19,21 +18,17 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
     protected TContext context;
     protected List<TData> cellData = new List<TData>();
 
-    protected virtual void Awake()
-    {
-        cellBase.SetActive(false);
+    protected virtual void Awake() {
     }
 
     /// <summary>
     /// コンテキストを設定します
     /// </summary>
     /// <param name="context"></param>
-    protected void SetContext(TContext context)
-    {
+    protected void SetContext(TContext context) {
         this.context = context;
 
-        for (int i = 0; i < cells.Count; i++)
-        {
+        for (int i = 0; i < cells.Count; i++) {
             cells[i].SetContext(context);
         }
     }
@@ -42,53 +37,29 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
     /// セルを生成して返します
     /// </summary>
     /// <returns></returns>
-    FancyScrollViewCell<TData, TContext> CreateCell()
-    {
+    FancyScrollViewCell<TData, TContext> CreateCell() {
+        GameObject cellBase = Resources.Load<GameObject>("Cell");
         var cellObject = Instantiate(cellBase);
-        cellObject.SetActive(true);
         var cell = cellObject.GetComponent<FancyScrollViewCell<TData, TContext>>();
 
+        cell.transform.SetParent(this.pnlList);
+        cell.transform.localScale = Vector3.one;
         var cellRectTransform = cell.transform as RectTransform;
-
-        // 親要素の付け替えをおこなうとスケールやサイズが失われるため、変数に保持しておく
-        var scale = cell.transform.localScale;
-        var sizeDelta = Vector2.zero;
-        var offsetMin = Vector2.zero;
-        var offsetMax = Vector2.zero;
-
-        if (cellRectTransform)
-        {
-            sizeDelta = cellRectTransform.sizeDelta;
-            offsetMin = cellRectTransform.offsetMin;
-            offsetMax = cellRectTransform.offsetMax;
-        }
-
-        cell.transform.SetParent(cellBase.transform.parent);
-
-        cell.transform.localScale = scale;
-        if (cellRectTransform)
-        {
-            cellRectTransform.sizeDelta = sizeDelta;
-            cellRectTransform.offsetMin = offsetMin;
-            cellRectTransform.offsetMax = offsetMax;
-        }
+        cellRectTransform.anchoredPosition3D = Vector3.zero;
 
         cell.SetContext(context);
-        cell.SetVisible(false);
 
         return cell;
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     float prevCellInterval, prevCellOffset;
     bool prevLoop;
 
-    void LateUpdate()
-    {
+    void LateUpdate() {
         if (prevLoop != loop ||
             prevCellOffset != cellOffset ||
-            prevCellInterval != cellInterval)
-        {
+            prevCellInterval != cellInterval) {
             UpdatePosition(currentPosition);
 
             prevLoop = loop;
@@ -96,23 +67,19 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
             prevCellInterval = cellInterval;
         }
     }
-    #endif
+#endif
 
     /// <summary>
     /// セルの内容を更新します
     /// </summary>
     /// <param name="cell"></param>
     /// <param name="dataIndex"></param>
-    void UpdateCellForIndex(FancyScrollViewCell<TData, TContext> cell, int dataIndex)
-    {
-        if (loop)
-        {
+    void UpdateCellForIndex(FancyScrollViewCell<TData, TContext> cell, int dataIndex) {
+        if (loop) {
             dataIndex = GetLoopIndex(dataIndex, cellData.Count);
-        }
-        else if (dataIndex < 0 || dataIndex > cellData.Count - 1)
-        {
-            // セルに対応するデータが存在しなければセルを表示しない
-            cell.SetVisible(false);
+        } else if (dataIndex < 0 || dataIndex > cellData.Count - 1) {
+            Debug.LogError("UpdateCellForIndex " + dataIndex);
+            //cell.SetVisible(false);
             return;
         }
 
@@ -127,14 +94,10 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
     /// <param name="index"></param>
     /// <param name="length"></param>
     /// <returns></returns>
-    int GetLoopIndex(int index, int length)
-    {
-        if (index < 0)
-        {
+    int GetLoopIndex(int index, int length) {
+        if (index < 0) {
             index = (length - 1) + (index + 1) % length;
-        }
-        else if (index > length - 1)
-        {
+        } else if (index > length - 1) {
             index = index % length;
         }
         return index;
@@ -143,61 +106,70 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
     /// <summary>
     /// 表示内容を更新します
     /// </summary>
-    protected void UpdateContents()
-    {
+    protected void UpdateContents() {
         UpdatePosition(currentPosition);
     }
+
+    private void ClearChildren(Transform root) {
+        int childCount = root.childCount;
+        Transform[] removeList = new Transform[childCount];
+        for (int i = 0; i < childCount; i++) {
+            removeList[i] = root.GetChild(i);
+        }
+        for (int i = 0; i < childCount; i++) {
+            GameObject.Destroy(removeList[i].gameObject);
+        }
+    }
+
 
     /// <summary>
     /// スクロール位置を更新します
     /// </summary>
     /// <param name="position"></param>
-    protected void UpdatePosition(float position)
-    {
+    protected void UpdatePosition(float position) {
         currentPosition = position;
 
-        var visibleMinPosition = position - (cellOffset / cellInterval);
-        var firstCellPosition = (Mathf.Ceil(visibleMinPosition) - visibleMinPosition) * cellInterval;
-        var dataStartIndex = Mathf.CeilToInt(visibleMinPosition);
-        var count = 0;
-        var cellIndex = 0;
-
-        for (float pos = firstCellPosition; pos <= 1f; pos += cellInterval, count++)
-        {
-            if (count >= cells.Count)
-            {
+        if (this.pnlList.childCount < 7) {
+            this.ClearChildren(this.pnlList);
+            for (int i = 0; i < 7; i++) {
                 cells.Add(CreateCell());
             }
         }
 
-        count = 0;
+        Vector3 preItemAnchorPos = Vector3.zero;
+        preItemAnchorPos.x -= cells[0].GetItemWidth() * position;
+        cells[0].UpdatePosition(preItemAnchorPos, 0, 0);
+        UpdateCellForIndex(cells[0], 0);
 
-        for (float pos = firstCellPosition; pos <= 1f; count++, pos += cellInterval)
-        {
-            var dataIndex = dataStartIndex + count;
-            cellIndex = GetLoopIndex(dataIndex, cells.Count);
-            if (cells[cellIndex].gameObject.activeSelf)
-            {
-                cells[cellIndex].UpdatePosition(pos);
+        var dataIndex = 0;
+        float itemWidth = 0;
+        int cellsCount = cells.Count;
+        for (int i = 1; i < cellsCount; i++) {
+            //dataIndex = Mathf.CeilToInt(position) + i;
+            //int cellIndex = GetLoopIndex(dataIndex, cellsCount);
+            dataIndex = i;
+            int cellIndex = i;
+            if (cells[cellIndex].gameObject.activeSelf) {
+                preItemAnchorPos = cells[cellIndex - 1].GetItemAnchorPos();
+                itemWidth = cells[cellIndex - 1].GetItemWidth();
+                cells[cellIndex].UpdatePosition(preItemAnchorPos, itemWidth, 10);
             }
             UpdateCellForIndex(cells[cellIndex], dataIndex);
         }
 
-        cellIndex = GetLoopIndex(dataStartIndex + count, cells.Count);
+        //cellIndex = GetLoopIndex(dataStartIndex + count, cells.Count);
 
-        for (; count < cells.Count; count++, cellIndex = GetLoopIndex(dataStartIndex + count, cells.Count))
-        {
-            cells[cellIndex].SetVisible(false);
-        }
+        //for (; count < cells.Count; count++, cellIndex = GetLoopIndex(dataStartIndex + count, cells.Count))
+        //{
+        //    cells[cellIndex].SetVisible(false);
+        //}
     }
 }
 
-public sealed class FancyScrollViewNullContext
-{
+public sealed class FancyScrollViewNullContext {
 
 }
 
-public class FancyScrollView<TData> : FancyScrollView<TData, FancyScrollViewNullContext>
-{
+public class FancyScrollView<TData> : FancyScrollView<TData, FancyScrollViewNullContext> {
 
 }
