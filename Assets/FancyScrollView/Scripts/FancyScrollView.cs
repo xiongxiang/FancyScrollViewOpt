@@ -2,10 +2,6 @@
 using UnityEngine;
 
 public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : class {
-    [SerializeField, Range(float.Epsilon, 1f)]
-    float cellInterval;
-    [SerializeField, Range(0f, 1f)]
-    float cellOffset;
     [SerializeField]
     bool loop;
     [SerializeField]
@@ -51,23 +47,6 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
 
         return cell;
     }
-
-#if UNITY_EDITOR
-    float prevCellInterval, prevCellOffset;
-    bool prevLoop;
-
-    void LateUpdate() {
-        if (prevLoop != loop ||
-            prevCellOffset != cellOffset ||
-            prevCellInterval != cellInterval) {
-            UpdatePosition(currentPosition);
-
-            prevLoop = loop;
-            prevCellOffset = cellOffset;
-            prevCellInterval = cellInterval;
-        }
-    }
-#endif
 
     /// <summary>
     /// セルの内容を更新します
@@ -155,6 +134,20 @@ public class FancyScrollView<TData, TContext> : MonoBehaviour where TContext : c
                 cells[cellIndex].UpdatePosition(preItemAnchorPos, itemWidth, 10);
             }
             UpdateCellForIndex(cells[cellIndex], dataIndex);
+        }
+
+        for (int i = 0; i < cellsCount; i++) {
+            preItemAnchorPos = cells[i].GetItemAnchorPos();
+            if(preItemAnchorPos.x < -cells[i].GetItemWidth() && ++dataIndex < cellData.Count) {
+                FancyScrollViewCell<TData, TContext> cell = cells[i];
+                cells.Add(cell);
+                cells[cellsCount].UpdatePosition(
+                    cells[cellsCount - 1].GetItemAnchorPos(), cells[cellsCount - 1].GetItemWidth(), 10);
+
+                UpdateCellForIndex(cells[i], dataIndex);
+                cells.RemoveAt(i);
+                --i;
+            }
         }
 
         //cellIndex = GetLoopIndex(dataStartIndex + count, cells.Count);

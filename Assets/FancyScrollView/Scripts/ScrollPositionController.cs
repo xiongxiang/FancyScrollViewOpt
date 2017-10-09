@@ -220,7 +220,6 @@ public class ScrollPositionController : UIBehaviour, IBeginDragHandler, IEndDrag
     public void ScrollTo(int index, float duration) {
         velocity = 0;
         dragStartScrollPosition = currentScrollPosition;
-
         autoScrollState.Enable = true;
         autoScrollState.Duration = duration;
         autoScrollState.StartTime = Time.unscaledTime;
